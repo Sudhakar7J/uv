@@ -216,20 +216,23 @@ required-environments = [
 ]
 ```
 
-To require a macOS release, use its
-[Darwin kernel version](<https://en.wikipedia.org/wiki/Darwin_(operating_system)#Darwin_20_onwards>)
-in `platform_release`. For example, macOS 15 uses Darwin 24:
+### Minimum macOS version
+
+Use `minimum-macos-version` with `required-environments` to require wheel coverage for the
+oldest macOS release you support. Specify the macOS deployment target as a `major.minor`
+string.
 
 ```toml title="pyproject.toml"
 [tool.uv]
-required-environments = [
-    "sys_platform == 'darwin' and platform_machine == 'arm64' and platform_release == '24.0.0'"
-]
+preview-features = ["minimum-macos-version"]
+required-environments = ["sys_platform == 'darwin' and platform_machine == 'arm64'"]
+minimum-macos-version = "14.0"
 ```
 
-Use `==` to require coverage at the baseline. A range like `>= '24.0.0'` can be satisfied by a wheel
-that only supports a newer release. Wheels targeting newer releases are still retained in the
-lockfile.
+A wheel tagged `macosx_14_0_arm64` covers this floor. A package version that only publishes
+`macosx_26_0_arm64` wheels needs a usable source distribution or uv will try another version.
+Newer wheels for the selected version remain in the lockfile for newer machines. The solver
+can still choose different pins by Python version or architecture.
 
 ### Minimum libc version
 

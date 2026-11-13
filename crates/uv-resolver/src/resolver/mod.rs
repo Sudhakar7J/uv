@@ -221,6 +221,7 @@ impl<'a, Context: BuildContext, InstalledPackages: InstalledPackagesProvider>
             build_context.build_options(),
             build_context.capabilities(),
             options.minimum_libc_version,
+            options.minimum_macos_version,
         );
 
         Ok(Self::new_custom_io(
@@ -1271,7 +1272,11 @@ impl<InstalledPackages: InstalledPackagesProvider> ResolverState<InstalledPackag
             // If the wheel does not cover a required environment, it is incompatible.
             if env.marker_environment().is_none() && !self.options.artifact_environments.is_empty()
             {
-                let wheel_marker = implied_markers(filename, self.options.minimum_libc_version);
+                let wheel_marker = implied_markers(
+                    filename,
+                    self.options.minimum_libc_version,
+                    self.options.minimum_macos_version,
+                );
                 // If the caller marked an environment as requiring artifact coverage, ensure it
                 // has coverage.
                 for environment_marker in self.options.artifact_environments.iter().copied() {
@@ -1681,8 +1686,6 @@ impl<InstalledPackages: InstalledPackagesProvider> ResolverState<InstalledPackag
                 {
                     // Separate the required environment from the candidate's wheel coverage in
                     // this fork, allowing environments in neither set to fall on either side.
-                    // For example, Darwin == 24 becomes Darwin < 25 when the wheels require
-                    // Darwin >= 25. This avoids introducing forks for unrelated wheel tags.
                     let coverage = dist.implied_markers().and(fork_markers);
                     let split = marker.restrict(marker.or(coverage));
                     let Some((left, right)) = fork_version_by_marker(env, split) else {

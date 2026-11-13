@@ -241,6 +241,7 @@ fn pip_compile_baseline() {
             [],
         ),
         minimum_libc_version: None,
+        minimum_macos_version: None,
         refresh: None(
             Timestamp(
                 SystemTime {

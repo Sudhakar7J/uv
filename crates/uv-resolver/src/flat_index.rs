@@ -11,7 +11,7 @@ use uv_configuration::BuildOptions;
 use uv_distribution_filename::{DistFilename, SourceDistFilename, WheelFilename};
 use uv_distribution_types::{
     File, Index, IndexEntryFilename, IndexLocations, IndexUrl, MinimumLibcVersion,
-    RegistryBuiltWheel, RegistrySourceDist,
+    MinimumMacosVersion, RegistryBuiltWheel, RegistrySourceDist,
 };
 use uv_normalize::PackageName;
 use uv_pep440::Version;
@@ -91,6 +91,7 @@ impl FlatDistributions {
         hasher: &HashStrategy,
         build_options: &BuildOptions,
         minimum_libc_version: Option<MinimumLibcVersion>,
+        minimum_macos_version: Option<MinimumMacosVersion>,
     ) -> Self {
         let mut distributions = Self::default();
         for entry in entries {
@@ -104,6 +105,7 @@ impl FlatDistributions {
                     build_options,
                     index,
                     minimum_libc_version,
+                    minimum_macos_version,
                 ),
                 IndexEntryFilename::VariantJson(filename) => {
                     distributions
@@ -138,6 +140,7 @@ impl FlatDistributions {
         build_options: &BuildOptions,
         index: IndexUrl,
         minimum_libc_version: Option<MinimumLibcVersion>,
+        minimum_macos_version: Option<MinimumMacosVersion>,
     ) {
         // No `requires-python` here: for source distributions, we don't have that information;
         // for wheels, we read it lazily only when selected.
@@ -163,6 +166,7 @@ impl FlatDistributions {
                     vec![],
                     compatibility,
                     minimum_libc_version,
+                    minimum_macos_version,
                 );
             }
             DistFilename::SourceDistFilename(filename) => {
